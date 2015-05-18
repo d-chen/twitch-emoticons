@@ -14,6 +14,17 @@ handler = logging.FileHandler('download.log')
 handler.setLevel(logging.INFO)
 logger.addHandler(handler)
 
+def create_json(emote_list):
+    my_list = []
+    TEMPLATE = "https://raw.githubusercontent.com/d-chen/twitch-emoticons/master/global/{0}.png"
+    
+    for key, value in emote_list.iteritems():
+        my_dict = {"id": key, "src": TEMPLATE.format(key)}
+        my_list.append(my_dict)
+
+    with open('global.json', 'w') as file:
+        json.dump(my_list, file)
+
 def download_emotes(emote_list):
     TEMPLATE = "http://static-cdn.jtvnw.net/emoticons/v1/{image_id}/1.0"
 
@@ -44,3 +55,4 @@ def get_emote_list():
 
 emote_list = get_emote_list()
 download_emotes(emote_list)
+create_json(emote_list)
