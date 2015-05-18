@@ -1,3 +1,5 @@
+import collections
+from collections import OrderedDict
 import json
 import logging
 import os
@@ -10,14 +12,14 @@ with open('download.log', 'w'):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-handler = logging.FileHandler('download.log')
+handler = logging.FileHandler('log_download.txt')
 handler.setLevel(logging.INFO)
 logger.addHandler(handler)
 
 def create_json(emote_list):
     my_list = []
     TEMPLATE = "https://raw.githubusercontent.com/d-chen/twitch-emoticons/master/global/{0}.png"
-    
+
     for key, value in emote_list.iteritems():
         my_dict = {"id": key, "src": TEMPLATE.format(key)}
         my_list.append(my_dict)
@@ -49,10 +51,9 @@ def get_emote_list():
     if (resp.status_code != 200):
         logger.error('Cannot get emote list. Status code={0}'.format(resp.status_code))
     else:
-        r_json = resp.json()
-        return r_json['emotes']
-        download_emotes(r_json['emotes'])
+        result = json.JSONDecoder(object_pairs_hook=collections.OrderedDict).decode(resp.text)
+        return result['emotes']
 
 emote_list = get_emote_list()
-download_emotes(emote_list)
+#download_emotes(emote_list)
 create_json(emote_list)
