@@ -6,7 +6,7 @@ import os
 import requests
 import shutil
 
-with open('download.log', 'w'):
+with open('log_download.txt', 'w'):
     pass
 
 logger = logging.getLogger(__name__)
@@ -19,10 +19,12 @@ logger.addHandler(handler)
 def create_json(emote_list):
     my_list = []
     TEMPLATE = "https://raw.githubusercontent.com/d-chen/twitch-emoticons/master/global/{0}.png"
+    REJECT = ['CougarHunt', 'EagleEye', 'RedCoat', 'StoneLightning', 'TheRinger']
 
     for key, value in emote_list.iteritems():
         my_dict = {"id": key, "src": TEMPLATE.format(key)}
-        my_list.append(my_dict)
+        if not key in REJECT:
+            my_list.append(my_dict)
 
     with open('global.json', 'w') as file:
         json.dump(my_list, file)
