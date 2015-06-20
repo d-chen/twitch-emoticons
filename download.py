@@ -42,7 +42,7 @@ def download_emotes(emote_list):
             with open(path, 'wb') as file:
                 for chunk in r.iter_content():
                     file.write(chunk)
-        logger.info('Finished downloading emotes')
+    logger.info('Finished downloading emotes')
 
 def get_emote_list():
     EMOTE_LIST_URL = "http://twitchemotes.com/api_cache/v2/global.json"
@@ -57,5 +57,5 @@ def get_emote_list():
         return result['emotes']
 
 emote_list = get_emote_list()
-#download_emotes(emote_list)
+download_emotes(emote_list)
 create_json(emote_list)
