@@ -16,25 +16,29 @@ handler = logging.FileHandler('log_download.txt')
 handler.setLevel(logging.INFO)
 logger.addHandler(handler)
 
-def create_json(emote_list):
+def create_json(emote_list, dir):
     my_list = []
-    TEMPLATE = "https://raw.githubusercontent.com/d-chen/twitch-emoticons/master/global/{0}.png"
-    REJECT = ['CougarHunt', 'EagleEye', 'RedCoat', 'StoneLightning', 'TheRinger']
+    TEMPLATE = "https://raw.githubusercontent.com/d-chen/twitch-emoticons/master/{1}/{0}.png"
+    REJECT = ['CougarHunt', 'EagleEye', 'RedCoat', 'StoneLightning', 'TheRinger', 'Evo2013']
 
-    for key, value in emote_list.iteritems():
-        my_dict = {"id": key, "src": TEMPLATE.format(key)}
-        if not key in REJECT:
+    for emote in emote_list:
+        code = emote['code']
+        iid = emote['image_id']
+        my_dict = {"id": code, "src": TEMPLATE.format(code, dir)}
+        if not code in REJECT:
             my_list.append(my_dict)
 
     with open('global.json', 'w') as file:
         json.dump(my_list, file)
 
-def download_emotes(emote_list):
+def download_emotes(emote_list, dir):
     TEMPLATE = "http://static-cdn.jtvnw.net/emoticons/v1/{image_id}/1.0"
 
-    for key, value in emote_list.iteritems():
-        url = TEMPLATE.format(image_id=value['image_id'])
-        path = './global/{id}.png'.format(id=key)
+    for emote in emote_list:
+        code = emote['code']
+        iid = emote['image_id']
+        url = TEMPLATE.format(image_id=iid)
+        path = './{dir}/{id}.png'.format(id=code, dir=dir)
 
         r = requests.get(url, stream=True)
         if r.status_code == 200:
@@ -45,7 +49,7 @@ def download_emotes(emote_list):
     logger.info('Finished downloading emotes')
 
 def get_emote_list():
-    EMOTE_LIST_URL = "http://twitchemotes.com/api_cache/v2/global.json"
+    EMOTE_LIST_URL = "http://twitchemotes.com/api_cache/v2/subscriber.json"
 
     logger.info('Requesting emote list from {0}'.format(EMOTE_LIST_URL))
     resp = requests.get(EMOTE_LIST_URL)
@@ -54,8 +58,8 @@ def get_emote_list():
         logger.error('Cannot get emote list. Status code={0}'.format(resp.status_code))
     else:
         result = json.JSONDecoder(object_pairs_hook=collections.OrderedDict).decode(resp.text)
-        return result['emotes']
+        return result['channels']['srkevo1']['emotes']
 
 emote_list = get_emote_list()
-download_emotes(emote_list)
-create_json(emote_list)
+#download_emotes(emote_list, "srkevo1")
+create_json(emote_list, "srkevo1")
