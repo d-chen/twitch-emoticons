@@ -82,7 +82,7 @@ def download_global_emotes(emote_list):
     TEMPLATE = "http://static-cdn.jtvnw.net/emoticons/v1/{image_id}/1.0"
 
     for key, value in emote_list.iteritems():
-        url = TEMPLATE.format(image_id=value['image_id'])
+        url = TEMPLATE.format(image_id=value['id'])
         path = './global/{id}.png'.format(id=key)
 
         r = requests.get(url, stream=True)
@@ -94,7 +94,7 @@ def download_global_emotes(emote_list):
     logger.info('Finished downloading emotes')
 
 def get_global_emote_list():
-    EMOTE_LIST_URL = "http://twitchemotes.com/api_cache/v2/global.json"
+    EMOTE_LIST_URL = "https://twitchemotes.com/api_cache/v3/global.json"
 
     logger.info('Requesting emote list from {0}'.format(EMOTE_LIST_URL))
     resp = requests.get(EMOTE_LIST_URL)
@@ -103,9 +103,9 @@ def get_global_emote_list():
         logger.error('Cannot get emote list. Status code={0}'.format(resp.status_code))
     else:
         result = json.JSONDecoder(object_pairs_hook=collections.OrderedDict).decode(resp.text)
-        return result['emotes']
-    
-    
+        return result
+
+
 emotes = get_global_emote_list()
 download_global_emotes(emotes)
 create_global_json(emotes)
